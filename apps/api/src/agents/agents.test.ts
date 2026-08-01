@@ -34,3 +34,17 @@ test("Apple AI相关文章合并为单一事件", () => {
   }) as EnrichedArticle[];
   assert.equal(new EventClusterAgent().cluster(enriched).length, 1);
 });
+
+test("social 不应被子串 soc 误判为半导体", () => {
+  const article: ArticleInput = {
+    title: "Australia's social media ban for under-16s has had limited impact so far",
+    summary: "There was no statistically significant change in AI chatbot use.",
+    url: "social-media-ban",
+    source: "test",
+    publishedAt: new Date().toISOString()
+  };
+  const entities = extractor.extract(article);
+  const result = classifier.classify(article, entities);
+  assert.notEqual(result.category, "半导体");
+  assert.equal(result.confidence, 0.45);
+});

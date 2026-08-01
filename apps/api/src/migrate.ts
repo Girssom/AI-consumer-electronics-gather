@@ -7,7 +7,9 @@ export function migrate(db: Database.Database): void {
     version TEXT PRIMARY KEY,
     applied_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   )`);
-  const migrationsDir = path.resolve(import.meta.dirname, "migrations");
+  const bundledMigrations = path.resolve(import.meta.dirname, "migrations");
+  const sourceMigrations = path.resolve(import.meta.dirname, "../src/migrations");
+  const migrationsDir = fs.existsSync(bundledMigrations) ? bundledMigrations : sourceMigrations;
   const files = fs.readdirSync(migrationsDir).filter((file) => file.endsWith(".sql")).sort();
   const applied = db.prepare("SELECT 1 FROM schema_migrations WHERE version = ?");
   const record = db.prepare("INSERT INTO schema_migrations (version) VALUES (?)");

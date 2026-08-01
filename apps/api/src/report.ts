@@ -87,6 +87,7 @@ export function getDailyReport(db: Database.Database) {
     LEFT JOIN industry_events e ON e.id=ea.event_id
     WHERE (a.url LIKE 'https://%' OR a.url LIKE 'http://%')
       AND datetime(a.published_at) >= datetime('now','-3 days')
+      AND a.classification_confidence >= 0.50
     GROUP BY a.id
     ORDER BY datetime(a.published_at) DESC,e.importance_score DESC
     LIMIT 120

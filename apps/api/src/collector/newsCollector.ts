@@ -3,6 +3,7 @@ import Parser from "rss-parser";
 import { processArticles } from "../pipeline.js";
 import type { ArticleInput } from "../types.js";
 import { defaultSources } from "./sources.js";
+import { matchesPhrase } from "../agents/textMatch.js";
 
 const parser = new Parser({
   timeout: 15_000,
@@ -32,7 +33,7 @@ function isRelevant(article: ArticleInput): boolean {
     if (offTopicChineseTerms.some((term) => title.includes(term))) return false;
     if (!chineseDeviceTerms.some((term) => title.includes(term))) return false;
   }
-  return relevantTerms.some((term) => text.includes(term));
+  return relevantTerms.some((term) => matchesPhrase(text, term));
 }
 
 function upsertSources(db: Database.Database): void {

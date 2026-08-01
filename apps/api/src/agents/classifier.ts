@@ -1,5 +1,6 @@
 import type { ArticleInput, Classification, Entities } from "../types.js";
 import { subjectRules } from "./taxonomy.js";
+import { matchesPhrase } from "./textMatch.js";
 
 const keywordRules = [
   { category: "半导体" as const, subcategory: "SoC", phrases: ["cpu", "芯片", "soc", "core ultra"] },
@@ -12,8 +13,8 @@ export class ClassificationAgent {
     const title = article.title.toLowerCase();
     const body = `${article.title} ${article.summary}`.toLowerCase();
     const candidates = subjectRules.map((rule) => {
-      const subjectHits = rule.phrases.filter((phrase) => title.includes(phrase)).length;
-      const productHits = rule.phrases.filter((phrase) => body.includes(phrase)).length;
+      const subjectHits = rule.phrases.filter((phrase) => matchesPhrase(title, phrase)).length;
+      const productHits = rule.phrases.filter((phrase) => matchesPhrase(body, phrase)).length;
       const entityBoost =
         (rule.category === "智能穿戴" && entities.products.includes("Pixel Watch")) ||
         (rule.category === "AI PC" && entities.products.includes("ThinkPad")) ||
@@ -21,7 +22,7 @@ export class ClassificationAgent {
       return { rule, score: Math.min(50, subjectHits * 25 + entityBoost * 30) + Math.min(30, productHits * 10) };
     });
     for (const rule of keywordRules) {
-      const hits = rule.phrases.filter((phrase) => body.includes(phrase)).length;
+      const hits = rule.phrases.filter((phrase) => matchesPhrase(body, phrase)).length;
       const existing = candidates.find((item) => item.rule.category === rule.category);
       if (existing) existing.score += Math.min(20, hits * 5);
       else candidates.push({ rule, score: Math.min(20, hits * 5) });
