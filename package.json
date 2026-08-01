@@ -1,0 +1,17 @@
+{
+  "name": "consumer-electronics-intelligence-v2",
+  "private": true,
+  "version": "2.0.0",
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,magenta \"npm run dev -w @cei/api\" \"npm run dev -w @cei/web\"",
+    "build": "npm run build -w @cei/api && npm run build -w @cei/web",
+    "test": "npm run test -w @cei/api",
+    "db:migrate": "npm run db:migrate -w @cei/api",
+    "pipeline": "npm run pipeline -w @cei/api",
+    "collect": "npm run collect -w @cei/api"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
